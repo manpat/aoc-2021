@@ -46,20 +46,19 @@ fn part_2(winning_numbers: &[i32], boards: &[BoardData]) {
 		.map(|data| Board::new(data))
 		.collect(): Vec<_>;
 
-	let mut winning_boards_and_numbers = Vec::with_capacity(boards.len());
+	let mut last_winning_board_and_number = None;
 
 	for &number in winning_numbers {
 		for board in boards.iter_mut() {
 			board.mark_value(number);
 		}
 
-		let newly_winning_boards = boards.drain_filter(|b| b.win_condition_met())
-			.zip(std::iter::repeat(number));
-
-		winning_boards_and_numbers.extend(newly_winning_boards);
+		if let Some(winning_board) = boards.drain_filter(|b| b.win_condition_met()).last() {
+			last_winning_board_and_number = Some((winning_board, number));
+		}
 	}
 
-	let (board, winning_number) = winning_boards_and_numbers.last().unwrap();
+	let (board, winning_number) = last_winning_board_and_number.unwrap();
 	let sum = board.unmarked_values_sum();
 	println!("last win board score: {}*{} = {}", sum, winning_number, sum*winning_number);
 }
@@ -70,9 +69,7 @@ fn part_2(winning_numbers: &[i32], boards: &[BoardData]) {
 type BoardData = [i32; 5*5];
 
 fn parse_board_data(s: &str) -> Option<BoardData> {
-	use std::str::FromStr;
-
-	let values = s.split_ascii_whitespace().map(i32::from_str).filter_map(Result::ok);
+	let values = s.split_ascii_whitespace().filter_map(|s| s.parse().ok());
 	let mut board = [0; 5*5];
 
 	for (cell, value) in board.iter_mut().zip(values) {
@@ -114,19 +111,7 @@ impl<'d> Board<'d> {
 	}
 
 	fn win_condition_met(&self) -> bool {
-		for row in 0..5 {
-			if self.is_row_filled(row) {
-				return true;
-			}
-		}
-
-		for column in 0..5 {
-			if self.is_column_filled(column) {
-				return true;
-			}
-		}
-
-		false
+		(0..5).any(|idx| self.is_row_filled(idx) || self.is_column_filled(idx))
 	}
 
 	fn is_row_filled(&self, row: usize) -> bool {
