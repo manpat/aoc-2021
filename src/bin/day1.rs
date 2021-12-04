@@ -2,11 +2,11 @@
 
 
 fn main() {
-	// part 1
 	let input = include_str!("day1.txt").lines()
 		.filter_map(|l| l.parse().ok())
 		.collect(): Vec<i32>;
 
+	// part 1
 	let num_increases = input.group_by(|&a, &b| a < b)
 		.map(|slice| slice.len()-1).sum(): usize;
 

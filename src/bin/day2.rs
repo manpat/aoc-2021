@@ -1,4 +1,4 @@
-#![feature(type_ascription, slice_group_by)]
+#![feature(type_ascription)]
 
 fn main() {
 	let input = include_str!("day2.txt").lines()
@@ -20,7 +20,6 @@ fn main() {
 	dbg!(position * depth);
 
 	// part 2
-
 	let (position, depth, _) = input.iter()
 		.fold((0, 0, 0), |(curr_pos, curr_depth, curr_aim), command| {
 			let (pos_diff, depth_diff, aim_diff) = match *command {
