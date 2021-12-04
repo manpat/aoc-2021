@@ -3,7 +3,7 @@
 
 
 fn main() {
-	let input = include_str!("day4.txt");
+	let input = include_str!("day4.txt").replace('\r', "");
 
 	let winning_numbers_str = input.lines().next().unwrap();
 	let winning_numbers = winning_numbers_str.split(',')
