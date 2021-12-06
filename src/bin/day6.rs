@@ -1,5 +1,6 @@
 #![feature(type_ascription)]
 
+use aoc_2021::Timer;
 
 fn main() {
 	let initial_state = include_str!("day6.txt").split(',')
@@ -17,6 +18,8 @@ struct LanternFish(u8);
 
 
 fn simulate_n_days(initial_state: &[LanternFish], days: usize) -> u64 {
+	let _timer = Timer::new();
+
 	// How many fish to spawn each day
 	let mut mature_fish_buckets = [0u64; 7];
 
