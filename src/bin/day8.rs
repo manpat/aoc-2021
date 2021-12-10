@@ -1,7 +1,5 @@
 #![feature(type_ascription)]
 
-use aoc_2021::Timer;
-
 fn main() {
 	let entries = include_str!("day8.txt").lines()
 		.filter_map(parse_entry)
@@ -20,32 +18,23 @@ struct Entry {
 
 #[derive(Debug, Clone, Copy)]
 struct Glyph {
-	segments: [bool; 7]
+	// bitset - each bit assigned to a segment
+	segments: u8
 }
 
 impl Glyph {
-	fn active_segment_count(&self) -> usize {
-		self.segments.iter()
-			.filter(|&&v| v)
-			.count()
+	fn active_segment_count(&self) -> u32 {
+		self.segments.count_ones()
 	}
 
 	fn xor(&self, o: &Glyph) -> Glyph {
-		let mut segments = [false; 7];
-
-		let to_compare = self.segments.iter().zip(&o.segments);
-
-		for (out, (&a, &b)) in segments.iter_mut().zip(to_compare) {
-			*out = a ^ b;
+		Glyph {
+			segments: self.segments ^ o.segments
 		}
-
-		Glyph{segments}
 	}
 
 	fn contains(&self, pattern: &Glyph) -> bool {
-		self.segments.iter().zip(&pattern.segments)
-			.filter(|(_, &pat)| pat)
-			.all(|(&seg, _)| seg)
+		self.segments & pattern.segments == pattern.segments
 	}
 }
 
@@ -69,7 +58,7 @@ fn parse_glyph_sequence(s: &str) -> Option<Vec<Glyph>> {
 }
 
 fn parse_glyph(s: &str) -> Option<Glyph> {
-	let mut segments = [false; 7];
+	let mut segments = 0u8;
 
 	for c in s.trim().chars() {
 		assert!(('a'..='g').contains(&c));
@@ -77,8 +66,7 @@ fn parse_glyph(s: &str) -> Option<Glyph> {
 		let index = c.to_digit(17)?
 			.checked_sub(10)?;
 
-		segments[index as usize] = true;
-
+		segments |= 1 << index;
 	}
 
 	Some(Glyph{segments})
